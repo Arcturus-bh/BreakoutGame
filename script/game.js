@@ -3,25 +3,49 @@ class Game {
 		this.name = "Casse-brique";
 		this.canvas = new GameCanvas();
 		this.ctx = this.canvas.canvas.getContext('2d');
-		this.maxScore = 10;
-		this.currentScore = 0;
+		this.maxLife = 3;
+		this.continueGame = true;
+		this.currentLife = this.maxLife;
+		this.lifeLabel = "";
+		this.updateLifeLabel();
 		//
 		this.paddle = new Paddle(this.ctx, this.canvas.width);
 		this.ball = new Ball(this.ctx, this.canvas.width, this.canvas.height)
 	}
 
-	updateScore(points) {
-		if (this.currentScore + points >= this.maxScore)
+	updateLifeLabel() {
+		this.lifeLabel = "❤ ".repeat(this.currentLife).trim();
+	}
+
+	updateLife() {
+		if (--this.currentLife < 0)
 		{
-			this.currentScore = this.maxScore;
-			console.log("Score max atteint! ("  + this.currentScore + ")");
+			this.currentLife = 0;
+			document.getElementById("life").innerText = "Game Over";
+			document.getElementById("break").innerText = "";
+			//this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 			return;
 		}
-		this.currentScore += points;
-		console.log("Nouveau score: " + this.currentScore);
+		this.updateLifeLabel();
+		this.countdown();
+	}
+
+	countdown() {
+		let countdown = 3;
+		const label = document.getElementById("break");
+		const interval = setInterval(() => {
+			label.innerText = "⌛ Game restarting in " + countdown;
+			countdown--;
+			
+			if (countdown < 0) {
+				clearInterval(interval); // Countdown stop
+				label.innerText = "🎮 Game in progress...";              
+				this.ball.ready = true;
+				this.continueGame = true;
+			}
+		}, 1000); // 1sec
 	}
 }
-
 
 class GameCanvas {
 	constructor() {
@@ -37,9 +61,10 @@ class GameCanvas {
 }
 
 const game = new Game();
+document.getElementById("break").innerText = "🎮 Game in progress...";
 
 
-// --- events for paddle motion fluidity (no cut when changing direction)
+// --- paddle motion fluidity event (no cut when changing direction)
 pressedKeys = {};
 document.addEventListener('keydown', function(event) {
     pressedKeys[event.key] = true;
@@ -58,12 +83,23 @@ function updatePaddle() {
     }
 }
 
+
 function gameLoop() {
+	document.getElementById("life").innerText = "Life: " + game.lifeLabel;
+	//
     game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
 	updatePaddle();
     game.paddle.draw();
-    game.ball.move(game.paddle.xCurrent, game.paddle.yCurrent, game.paddle.paddleWidth);
+	//
+	if (game.ball.ready === true)
+    	game.continueGame = game.ball.move(game.paddle.xCurrent, game.paddle.yCurrent, game.paddle.paddleWidth);
+	if (game.ball.ready === false && game.continueGame === false) {
+		game.updateLife();
+		game.continueGame = true;
+	}
+	//
     requestAnimationFrame(gameLoop); // this function will always be called in the web loop
 }
 
 gameLoop();
+document.getElementById("break").innerText = "Game Over";
