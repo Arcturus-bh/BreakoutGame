@@ -3,61 +3,50 @@ class Ball {
 		this.ctx = ctx;
 		this.heightLimit = heightLimit;
 		this.widthLimit = widthLimit;
-
+        this.x = widthLimit / 2;
+        this.y = heightLimit / 2;
 		this.radius = 6;
-        this.xCurrent = widthLimit / 2;
-        this.yCurrent = heightLimit / 2;
         this.dx = 4;
         this.dy = -4;
-        this.color = '#5505a0ad';
+        this.color = '#000000';
 		this.ready = true;
 		this.draw();
 	}
 
 	draw() {
         this.ctx.beginPath();
-        this.ctx.arc(this.xCurrent, this.yCurrent, this.radius, 0, Math.PI * 2);
+        this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         this.ctx.fillStyle = this.color;
         this.ctx.fill();
         this.ctx.closePath();
     }
 
-	resetPosition() {
-		this.xCurrent = this.widthLimit / 2;
-		this.yCurrent = this.heightLimit / 2;
+	move() {
+		this.x += this.dx;
+		this.y += this.dy;
+		this.draw();
+	}
+
+	reset() {
+		this.x = this.widthLimit / 2;
+		this.y = this.heightLimit / 2;
 		this.dx = 4;
         this.dy = -4;
 	}
 
-	move(xPaddleCurrent, yPaddleCurrent, paddleWidth) {
-		this.xCurrent += this.dx;
-		this.yCurrent += this.dy;
+	bounceX() {
+		this.dx = -this.dx;
+	}
 
-		// wall collision
-		if (this.xCurrent - this.radius < 0 || this.xCurrent + this.radius > this.widthLimit) {
-			this.dx = -this.dx;
-		}
+	bounceY() {
+		this.dy = -this.dy;
+	}
 
-		// ceil collision
-		if (this.yCurrent - this.radius < 0) {
-			this.dy = -this.dy;
-		}
-		
-		// ground collision
-		if (this.yCurrent + this.radius > this.heightLimit) {
-			this.ready = false;
-			this.resetPosition();
-			return false;
-		}
-		
+	isReady() {
+		this.ready = true;
+	}
 
-		// paddle collision
-		if (this.yCurrent + this.radius >= yPaddleCurrent &&
-			this.xCurrent >= xPaddleCurrent &&
-			this.xCurrent <= xPaddleCurrent + paddleWidth) {
-			this.dy = -this.dy;
-		}
-		this.draw();
-		return true;
+	isNotReady() {
+		this.ready = false;
 	}
 }

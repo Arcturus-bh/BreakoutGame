@@ -1,0 +1,28 @@
+body {
+	font-family: 'Segoe UI', Roboto, sans-serif;
+	text-align: center;
+	background-color: #9c7d96;
+}
+
+canvas {
+	display: block;
+    margin: auto;
+    box-shadow: 0 0 50px #5505a0ad;
+	background-color: rgb(236, 149, 229);
+	border-radius: 20px;
+}
+
+h1 {
+    font-size: 50px;
+	color: #850073;
+}
+
+h2 {
+	font-size: 35px;
+	color: #000;
+	margin-bottom: 10px;
+}
+
+#life {
+    color: rgb(0, 0, 0);
+}
